@@ -20,11 +20,10 @@
 # WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 module PolyParent #:nodoc:
-  require 'poly_parent_url_helper'
-  ActionView::Base.instance_eval { include PolyParent::UrlHelper }
-
   def self.included(base) # :nodoc:
     base.extend ClassMethods
+    base.instance_eval { include PolyParent::UrlHelper }
+    base.instance_eval { helper_method :polymorphic_url, :url_for }
   end
 
   module ClassMethods
