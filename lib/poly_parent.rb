@@ -20,6 +20,8 @@
 # WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 module PolyParent #:nodoc:
+  require 'poly_parent_url_helper'
+  ActionView::Base.instance_eval { include PolyParent::UrlHelper }
 
   def self.included(base) # :nodoc:
     base.extend ClassMethods
@@ -45,18 +47,15 @@ module PolyParent #:nodoc:
 
 protected
   def set_poly_parents
-    if parent_instances.blank?
-      raise ArgumentError, "No parent resources found in the request path \"#{request.path}\". #{self.class} has to be accessed through a PolyParent route!"
-    else
-      @parents = parent_instances
-    end
+    @parents = parent_instances
+    @owner = @parents.last
   end
-  
+
 private
   def parent_resource_id(parent)
     request.path_parameters["#{ parent }_id"]
   end
-  
+
   def instance_from_path_component(path_component)
     klass = path_component.classify.constantize.base_class
     klass.find(parent_resource_id(path_component)).becomes(klass)
